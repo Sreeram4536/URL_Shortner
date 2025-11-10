@@ -9,7 +9,7 @@ export default function LandingPage() {
   const [url, setUrl] = useState('');
   const [shortUrl, setShortUrl] = useState('');
   const [copied, setCopied] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading,setLoading] = useState(false);
 
    const { isAuthenticated, logout } = useAuth();
    const navigate = useNavigate()
