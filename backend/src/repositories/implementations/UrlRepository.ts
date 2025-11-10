@@ -1,5 +1,5 @@
 import IUrlRepository from '../interfaces/IUrlRepository';
-import UrlModel, { IUrl } from '../../models/urlModel';
+import  { UrlModel,IUrl } from '../../models/urlModel';
 
 export default class UrlRepository implements IUrlRepository {
   async create(url: Partial<IUrl>): Promise<IUrl> {
@@ -9,7 +9,7 @@ export default class UrlRepository implements IUrlRepository {
     return UrlModel.findOne({ shortId });
   }
   async findByUser(userId: string): Promise<IUrl[]> {
-    return UrlModel.find({ user: userId }).sort({ createdAt: -1 });
+    return UrlModel.find({ userId }).sort({ createdAt: -1 });
   }
   async incrementVisits(shortId: string): Promise<void> {
     await UrlModel.updateOne({ shortId }, { $inc: { visits: 1 } });

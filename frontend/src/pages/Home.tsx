@@ -1,16 +1,43 @@
 import { useState } from 'react';
 import { Link2, BarChart3, Shield, Zap, Copy, Check } from 'lucide-react';
+import { useAuth } from '../context/authContext';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import { urlService } from '../services/urlService';
 
 export default function LandingPage() {
   const [url, setUrl] = useState('');
   const [shortUrl, setShortUrl] = useState('');
   const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleShorten = () => {
-    if (url) {
-      // Simulate URL shortening
-      const randomId = Math.random().toString(36).substring(7);
-      setShortUrl(`lnkshrt.co/${randomId}`);
+   const { isAuthenticated, logout } = useAuth();
+   const navigate = useNavigate()
+
+//   const handleShorten = () => {
+//     if (url) {
+//       // Simulate URL shortening
+//       const randomId = Math.random().toString(36).substring(7);
+//       setShortUrl(`lnkshrt.co/${randomId}`);
+//     }
+//   };
+
+const handleShorten = async () => {
+    if (!url.trim()) {
+      toast.error('Please enter a valid URL.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const { shortUrl } = await urlService.shortenUrl(url);
+      setShortUrl(shortUrl);
+      toast.success('URL shortened successfully!');
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.response?.data?.message || 'Failed to shorten URL');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -18,6 +45,12 @@ export default function LandingPage() {
     navigator.clipboard.writeText(shortUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+    const handleLogout = () => {
+    logout();
+    toast.info('You have been logged out.');
+    navigate('/auth');
   };
 
   return (
@@ -46,22 +79,54 @@ export default function LandingPage() {
       `}</style>
 
       {/* Navbar */}
-      <nav className="relative z-10 px-6 py-4 border-b border-gray-800/50 backdrop-blur-sm">
+       <nav className="relative z-10 px-6 py-4 border-b border-gray-800/50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* Logo */}
           <div className="flex items-center space-x-2">
             <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/50">
               <Link2 className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">LinkShort</span>
+            <span className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              LinkShort
+            </span>
           </div>
+
+          {/* Menu Buttons */}
           <div className="flex items-center space-x-6">
-            <a href="#features" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">Features</a>
-            <a href="#pricing" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">Pricing</a>
-            <a href="#about" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">About</a>
-            <button className="text-gray-300 hover:text-white transition-colors text-sm font-medium">Sign In</button>
-            <button className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg hover:shadow-purple-500/50 transition-all transform hover:-translate-y-0.5">
-              Get Started
-            </button>
+            <a href="#features" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">
+              Features
+            </a>
+            <a href="#pricing" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">
+              Pricing
+            </a>
+            <a href="#about" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">
+              About
+            </a>
+
+            {/* Auth Buttons */}
+            {!isAuthenticated ? (
+              <>
+                <button
+                  onClick={() => navigate('/auth')}
+                  className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => navigate('/auth')}
+                  className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg hover:shadow-purple-500/50 transition-all transform hover:-translate-y-0.5"
+                >
+                  Get Started
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleLogout}
+                className="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg hover:shadow-pink-500/50 transition-all transform hover:-translate-y-0.5"
+              >
+                Logout
+              </button>
+            )}
           </div>
         </div>
       </nav>
@@ -203,6 +268,8 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
+       {!isAuthenticated && (
+
       <section className="relative z-10 max-w-7xl mx-auto px-6 py-20 text-center">
         <div className="bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 rounded-2xl p-12">
           <h2 className="text-4xl font-bold text-white mb-4">Ready to Get Started?</h2>
@@ -214,6 +281,8 @@ export default function LandingPage() {
           </button>
         </div>
       </section>
+      )}
+
 
       {/* Footer */}
       <footer className="relative z-10 border-t border-gray-800/50 mt-20">

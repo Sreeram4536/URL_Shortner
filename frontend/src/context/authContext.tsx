@@ -7,7 +7,8 @@ import { authService } from '../services/authService';
 interface AuthContextType {
   isAuthenticated: boolean;
   token: string | null;
-  login: (email: string, password: string) => Promise<void>;
+  // login: (email: string, password: string) => Promise<void>;
+  login: (token: string) => void;
   logout: () => void;
 }
 
@@ -21,10 +22,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setupAxiosInterceptors(() => token);
   }, [token]);
 
-  const login = async (email: string, password: string) => {
+  // const login = async (email: string, password: string) => {
+  //   try {
+  //     const data = await authService.login(email, password);
+  //     setToken(data.token);
+  //   } catch (error) {
+  //     console.error('Login failed:', error);
+  //     throw error;
+  //   }
+  // };
+
+  const login = async (token:string) => {
     try {
-      const data = await authService.login(email, password);
-      setToken(data.token);
+      // const data = await authService.login(email, password);
+      setToken(token);
     } catch (error) {
       console.error('Login failed:', error);
       throw error;

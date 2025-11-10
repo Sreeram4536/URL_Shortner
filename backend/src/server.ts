@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db";
 import authRouter from "./routes/authRoutes";
+import urlRouter from "./routes/urlRoutes";
+import publicRoute from "./routes/publicRoutes";
 
 dotenv.config();
 
@@ -12,6 +14,8 @@ app.use(express.json());
 connectDB();
 
 app.use('/api/auth', authRouter);
+app.use('/api/url',urlRouter)
+app.use('/',publicRoute)
 
 app.get("/", (req, res) => {
   res.send("Backend is running ✅");

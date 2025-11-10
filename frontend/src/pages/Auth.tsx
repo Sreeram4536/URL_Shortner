@@ -37,9 +37,9 @@ export default function AuthPage() {
           return;
         }
 
-        await authService.login(formData.email, formData.password);
-        // login(data.token);
-        login(formData.email,formData.password)
+        const data = await authService.login(formData.email, formData.password);
+        login(data.token);
+        // login(formData.email,formData.password)
         toast.success('Signed in successfully!');
         navigate('/');
       }
@@ -57,8 +57,8 @@ export default function AuthPage() {
           return;
         }
 
-        await authService.register(formData.name, formData.email, formData.password);
-        await login(formData.email, formData.password);
+        const data = await authService.register(formData.name, formData.email, formData.password);
+        await login(data.token);
       toast.success(`Welcome, ${formData.name}!`);
       navigate('/'); // redirect to home
         toast.success('Account created successfully!');

@@ -1,12 +1,12 @@
 import axiosInstance from "../axios/axiosInstance";
 
 export const urlService = {
-    async shortenUrlAPI(originalUrl:string){
+    async shortenUrl(originalUrl:string){
         const response = await axiosInstance.post('/url/shorten',{originalUrl})
         return response.data;
     },
     async getUserUrls() {
-    const response = await axiosInstance.get('/url/user');
+    const response = await axiosInstance.get('/url/my-urls');
     return response.data;
   },
 }
