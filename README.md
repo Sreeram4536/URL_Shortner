@@ -46,7 +46,4 @@ This project demonstrates a **cleanly layered architecture** with:
 | **Styling** | Tailwind CSS |
 | **HTTP Client** | Axios |
 
----
-
-## 🗂️ Project Structure
 
