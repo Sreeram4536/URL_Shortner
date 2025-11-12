@@ -48,7 +48,8 @@ export default function AuthPage() {
         const data = await authService.register(
           parsed.data.name,
           parsed.data.email,
-          parsed.data.password
+          parsed.data.password,
+          parsed.data.confirmPassword
         );
         await login(data.token);
         navigate("/");
