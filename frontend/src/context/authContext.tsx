@@ -15,7 +15,8 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [token, setToken] = useState<string | null>(null);
+  // Initialize token from localStorage immediately
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
 
   // Setup axios interceptors dynamically
   useEffect(() => {
@@ -32,9 +33,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   //   }
   // };
 
-  const login = async (token:string) => {
+  const login = async (token: string) => {
     try {
       // const data = await authService.login(email, password);
+      // Save token to localStorage
+      localStorage.setItem('token', token);
       setToken(token);
     } catch (error) {
       console.error('Login failed:', error);
@@ -44,6 +47,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const logout = () => {
     setToken(null);
+    localStorage.removeItem('token'); // Remove token from localStorage
   };
 
   return (

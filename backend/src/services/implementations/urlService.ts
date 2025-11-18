@@ -22,9 +22,9 @@ export class UrlService implements IUrlService {
     return UrlMapper.toUrlDTO(url);
   }
 
-  async getUserUrls(userId: string): Promise<UrlDTO[]> {
-    const urls = await this.urlRepository.findByUser(userId);
-    return urls.map(UrlMapper.toUrlDTO);
+  async getUserUrls(userId: string, page = 1, limit = 10): Promise<{ items: UrlDTO[], total: number }> {
+    const { items, total } = await this.urlRepository.findByUser(userId, page, limit);
+    return { items: items.map(UrlMapper.toUrlDTO), total };
   }
 
    async getOriginalUrl(shortId: string): Promise<string | null> {

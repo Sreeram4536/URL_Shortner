@@ -33,8 +33,10 @@ class UrlController {
             var _a;
             try {
                 const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
-                const urls = yield this.urlService.getUserUrls(userId);
-                res.status(200).json(urls);
+                const page = parseInt(req.query.page) || 1;
+                const limit = parseInt(req.query.limit) || 10;
+                const result = yield this.urlService.getUserUrls(userId, page, limit);
+                res.status(200).json(result);
             }
             catch (error) {
                 res.status(400).json({ message: error.message });

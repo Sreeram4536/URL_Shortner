@@ -7,6 +7,7 @@ exports.authMiddleware = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const authMiddleware = (req, res, next) => {
     var _a;
+    console.log('AUTH MIDDLEWARE HEADER:', req.headers.authorization);
     const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
     if (!token)
         return res.status(401).json({ message: 'Unauthorized' });
@@ -15,8 +16,9 @@ const authMiddleware = (req, res, next) => {
         req.user = decoded;
         next();
     }
-    catch (_b) {
-        res.status(401).json({ message: 'Invalid token' });
+    catch (err) {
+        console.error('JWT Middleware Error:', err);
+        res.status(401).json({ message: err.message || 'Invalid token' });
     }
 };
 exports.authMiddleware = authMiddleware;

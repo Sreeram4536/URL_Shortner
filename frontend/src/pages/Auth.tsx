@@ -55,6 +55,7 @@ export default function AuthPage() {
         navigate("/");
         toast.success("Account created successfully!");
         setCurrentView("signin");
+        setLoading(false); // <-- add for consistency
       } else if (currentView === "signin") {
         const parsed = signinSchema.safeParse(formData);
         if (!parsed.success) {
@@ -62,16 +63,23 @@ export default function AuthPage() {
           setLoading(false);
           return;
         }
-        const data = await authService.login(
-          parsed.data.email,
-          parsed.data.password
-        );
-        login(data.token);
-        navigate("/");
-        toast.success("Signed in successfully!");
+        try {
+          const data = await authService.login(
+            parsed.data.email,
+            parsed.data.password
+          );
+          login(data.token);
+          navigate("/");
+          toast.success("Signed in successfully!");
+          setLoading(false); // <-- add to re-enable button on success
+        } catch (loginError: any) {
+          toast.error(loginError.response?.data?.message || "Invalid credentials");
+          setLoading(false); // <-- make button usable again on failure
+        }
       }
     } catch (err) {
       toast.error("Something went wrong!");
+      setLoading(false);
     }
   };
 

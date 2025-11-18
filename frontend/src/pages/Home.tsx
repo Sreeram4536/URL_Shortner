@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link2, BarChart3, Shield, Zap, Copy, Check } from "lucide-react";
 import { useAuth } from "../context/authContext";
 import { toast } from "react-toastify";
@@ -10,6 +10,11 @@ export default function LandingPage() {
   const [shortUrl, setShortUrl] = useState("");
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState<{ items: any[]; total: number } | null>(null);
+  const [historyPage, setHistoryPage] = useState(1);
+  const [historyLimit] = useState(5); // Adjustable
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState<string | null>(null);
 
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
@@ -52,6 +57,16 @@ export default function LandingPage() {
     toast.info("You have been logged out.");
     navigate("/auth");
   };
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    setHistoryLoading(true);
+    setHistoryError(null);
+    urlService.getUserUrls(historyPage, historyLimit)
+      .then(setHistory)
+      .catch(e => setHistoryError(e.response?.data?.message || "Failed to fetch history"))
+      .finally(() => setHistoryLoading(false));
+  }, [isAuthenticated, historyPage, historyLimit]);
 
   return (
     <div
@@ -102,18 +117,7 @@ export default function LandingPage() {
             >
               Features
             </a>
-            <a
-              href="#pricing"
-              className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
-            >
-              Pricing
-            </a>
-            <a
-              href="#about"
-              className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
-            >
-              About
-            </a>
+           
 
             {/* Auth Buttons */}
             {!isAuthenticated ? (
@@ -242,6 +246,64 @@ export default function LandingPage() {
             )}
           </div>
         </div>
+
+        {/* User URL History Section (Beneath Shortener) */}
+        {isAuthenticated && (
+          <div className="max-w-3xl mx-auto mt-10">
+            <h3 className="text-xl font-semibold text-white mb-4">Your URL History</h3>
+            {historyLoading ? (
+              <div className="text-cyan-400 py-6 text-center">Loading your links...</div>
+            ) : historyError ? (
+              <div className="text-red-500 py-6 text-center">{historyError}</div>
+            ) : history && history.items.length > 0 ? (
+              <>
+                <div className="overflow-x-auto rounded-lg shadow">
+                  <table className="min-w-full bg-gray-800/80 text-white border border-gray-700">
+                    <thead>
+                      <tr>
+                        <th className="py-3 px-4 border-b border-gray-700">Original URL</th>
+                        <th className="py-3 px-4 border-b border-gray-700">Short URL</th>
+                        <th className="py-3 px-4 border-b border-gray-700">Clicks</th>
+                        <th className="py-3 px-4 border-b border-gray-700">Created At</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {history.items.map((url) => (
+                        <tr key={url.shortId} className="hover:bg-gray-700/50 transition-all">
+                          <td className="py-2 px-4 max-w-xs overflow-x-auto"><span className="break-all text-cyan-200">{url.originalUrl}</span></td>
+                          <td className="py-2 px-4">
+                            <a href={url.shortUrl} target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">{url.shortUrl}</a>
+                          </td>
+                          <td className="py-2 px-4 text-center">{url.clicks ?? url.visits ?? 0}</td>
+                          <td className="py-2 px-4 text-center">{url.createdAt ? new Date(url.createdAt).toLocaleString() : ''}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="flex justify-between items-center mt-4">
+                  <button
+                    onClick={() => setHistoryPage((p) => Math.max(1, p - 1))}
+                    disabled={historyPage <= 1}
+                    className="px-4 py-2 rounded bg-cyan-600 hover:bg-cyan-700 text-white disabled:opacity-40"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-gray-300">Page {historyPage} of {Math.ceil(history.total / historyLimit)}</span>
+                  <button
+                    onClick={() => setHistoryPage((p) => p + 1)}
+                    disabled={historyPage >= Math.ceil(history.total / historyLimit)}
+                    className="px-4 py-2 rounded bg-cyan-600 hover:bg-cyan-700 text-white disabled:opacity-40"
+                  >
+                    Next
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="text-gray-400 py-6 text-center">You have not shortened any links yet.</div>
+            )}
+          </div>
+        )}
 
         <div className="flex items-center justify-center space-x-8 text-sm text-gray-400">
           <div className="flex items-center space-x-2">

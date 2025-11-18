@@ -33,10 +33,10 @@ class UrlService {
             return url_mapper_1.UrlMapper.toUrlDTO(url);
         });
     }
-    getUserUrls(userId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const urls = yield this.urlRepository.findByUser(userId);
-            return urls.map(url_mapper_1.UrlMapper.toUrlDTO);
+    getUserUrls(userId_1) {
+        return __awaiter(this, arguments, void 0, function* (userId, page = 1, limit = 10) {
+            const { items, total } = yield this.urlRepository.findByUser(userId, page, limit);
+            return { items: items.map(url_mapper_1.UrlMapper.toUrlDTO), total };
         });
     }
     getOriginalUrl(shortId) {

@@ -21,9 +21,17 @@ class UrlRepository {
             return urlModel_1.UrlModel.findOne({ shortId });
         });
     }
-    findByUser(userId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return urlModel_1.UrlModel.find({ userId }).sort({ createdAt: -1 });
+    findByUser(userId_1) {
+        return __awaiter(this, arguments, void 0, function* (userId, page = 1, limit = 10) {
+            const skip = (page - 1) * limit;
+            const [items, total] = yield Promise.all([
+                urlModel_1.UrlModel.find({ userId })
+                    .sort({ createdAt: -1 })
+                    .skip(skip)
+                    .limit(limit),
+                urlModel_1.UrlModel.countDocuments({ userId })
+            ]);
+            return { items, total };
         });
     }
     incrementVisits(shortId) {

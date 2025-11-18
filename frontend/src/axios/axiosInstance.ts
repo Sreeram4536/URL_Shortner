@@ -36,6 +36,7 @@ export const setupAxiosInterceptors = (getToken: () => string | null) => {
 requestInterceptorId = axiosInstance.interceptors.request.use(
   (config) => {
     const token = getToken();
+    console.log("[Axios Interceptor] Attaching token to header:", token); // DEBUG LINE
     if (token) {
       // Use the AxiosHeaders set method
       config.headers = config.headers ?? {};
