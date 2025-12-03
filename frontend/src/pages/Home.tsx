@@ -276,7 +276,7 @@ export default function LandingPage() {
                       <tr>
                         <th className="py-3 px-4 border-b border-gray-700">Original URL</th>
                         <th className="py-3 px-4 border-b border-gray-700">Short URL</th>
-                        <th className="py-3 px-4 border-b border-gray-700">Clicks</th>
+                        {/* <th className="py-3 px-4 border-b border-gray-700">Clicks</th> */}
                         <th className="py-3 px-4 border-b border-gray-700">Created At</th>
                       </tr>
                     </thead>
@@ -287,7 +287,7 @@ export default function LandingPage() {
                           <td className="py-2 px-4">
                             <a href={url.shortUrl} target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">{url.shortUrl}</a>
                           </td>
-                          <td className="py-2 px-4 text-center">{url.clicks ?? url.visits ?? 0}</td>
+                          {/* <td className="py-2 px-4 text-center">{url.clicks ?? url.visits ?? 0}</td> */}
                           <td className="py-2 px-4 text-center">{url.createdAt ? new Date(url.createdAt).toLocaleString() : ''}</td>
                         </tr>
                       ))}
