@@ -6,6 +6,14 @@ const axiosInstance = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+// If a token exists in localStorage on module load (page refresh case),
+// set the default Authorization header so the first requests include it
+// even before React effects run to register interceptors.
+const initialToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+if (initialToken) {
+  axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${initialToken}`;
+}
+
 // Keep track of interceptor IDs so we can eject if needed
 let requestInterceptorId: number;
 let responseInterceptorId: number;
@@ -35,15 +43,16 @@ export const setupAxiosInterceptors = (getToken: () => string | null) => {
 //   );
 requestInterceptorId = axiosInstance.interceptors.request.use(
   (config) => {
-    const token = getToken();
-    console.log("[Axios Interceptor] Attaching token to header:", token); // DEBUG LINE
+    // First try the provided getter (keeps things testable),
+    // then fall back to localStorage to cover page refresh cases
+    // where the context/setup may not have run yet.
+    const token = getToken() || localStorage.getItem('token');
+    // Attach token if available
     if (token) {
-      // Use the AxiosHeaders set method
       config.headers = config.headers ?? {};
       if ('set' in config.headers) {
         config.headers.set('Authorization', `Bearer ${token}`);
       } else {
-        // fallback for plain object headers
         (config.headers as any)['Authorization'] = `Bearer ${token}`;
       }
     }

@@ -8,35 +8,37 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const urlModel_1 = require("../../models/urlModel");
-class UrlRepository {
-    create(url) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return urlModel_1.UrlModel.create(url);
-        });
+const BaseRepository_1 = __importDefault(require("../BaseRepository"));
+class UrlRepository extends BaseRepository_1.default {
+    constructor() {
+        super(urlModel_1.UrlModel);
     }
     findByShortId(shortId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return urlModel_1.UrlModel.findOne({ shortId });
+            return this.model.findOne({ shortId });
         });
     }
     findByUser(userId_1) {
         return __awaiter(this, arguments, void 0, function* (userId, page = 1, limit = 10) {
             const skip = (page - 1) * limit;
             const [items, total] = yield Promise.all([
-                urlModel_1.UrlModel.find({ userId })
+                this.model.find({ userId })
                     .sort({ createdAt: -1 })
                     .skip(skip)
                     .limit(limit),
-                urlModel_1.UrlModel.countDocuments({ userId })
+                this.model.countDocuments({ userId })
             ]);
             return { items, total };
         });
     }
     incrementVisits(shortId) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield urlModel_1.UrlModel.updateOne({ shortId }, { $inc: { visits: 1 } });
+            yield this.model.updateOne({ shortId }, { $inc: { visits: 1 } });
         });
     }
 }

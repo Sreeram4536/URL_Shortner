@@ -1,14 +1,14 @@
 import IUserRepository from '../interfaces/IUserRepository';
 import UserModel, { IUser } from '../../models/userModel';
+import BaseRepository from '../BaseRepository';
 
-export default class UserRepository implements IUserRepository {
-  async create(user: Partial<IUser>): Promise<IUser> {
-    return UserModel.create(user);
+export default class UserRepository extends BaseRepository<IUser> implements IUserRepository {
+  constructor() {
+    super(UserModel);
   }
+
   async findByEmail(email: string): Promise<IUser | null> {
-    return UserModel.findOne({ email });
+    return this.model.findOne({ email });
   }
-  async findById(id: string): Promise<IUser | null> {
-    return UserModel.findById(id);
-  }
+  // The inherited create, findById, etc. work as before.
 }

@@ -37,6 +37,19 @@ export default function LandingPage() {
       setLoading(true);
       const { shortUrl } = await urlService.shortenUrl(url);
       setShortUrl(shortUrl);
+      // After successfully shortening, refresh the user's history
+      // so the new short URL appears immediately without a manual refresh.
+      if (isAuthenticated) {
+        setHistoryLoading(true);
+        try {
+          const fresh = await urlService.getUserUrls(historyPage, historyLimit);
+          setHistory(fresh);
+        } catch (e: any) {
+          console.error('Failed to refresh history after shorten:', e);
+        } finally {
+          setHistoryLoading(false);
+        }
+      }
       toast.success("URL shortened successfully!");
     } catch (error: any) {
       console.error(error);

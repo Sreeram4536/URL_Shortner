@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { setupAxiosInterceptors } from '../axios/axiosInstance';
+import axiosInstance from '../axios/axiosInstance';
 // import { authService } from '../services/authService';
 
 
@@ -35,9 +36,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const login = async (token: string) => {
     try {
-      // const data = await authService.login(email, password);
-      // Save token to localStorage
+     
       localStorage.setItem('token', token);
+   
+      axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setToken(token);
     } catch (error) {
       console.error('Login failed:', error);
@@ -48,6 +50,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const logout = () => {
     setToken(null);
     localStorage.removeItem('token'); // Remove token from localStorage
+    // Remove default header to avoid sending stale token
+    if (axiosInstance.defaults.headers.common['Authorization']) {
+      delete axiosInstance.defaults.headers.common['Authorization'];
+    }
   };
 
   return (

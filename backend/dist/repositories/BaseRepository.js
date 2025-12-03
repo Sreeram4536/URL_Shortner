@@ -8,20 +8,35 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const userModel_1 = __importDefault(require("../../models/userModel"));
-const BaseRepository_1 = __importDefault(require("../BaseRepository"));
-class UserRepository extends BaseRepository_1.default {
-    constructor() {
-        super(userModel_1.default);
+class BaseRepository {
+    constructor(model) {
+        this.model = model;
     }
-    findByEmail(email) {
+    findAll() {
+        return __awaiter(this, arguments, void 0, function* (filter = {}) {
+            return this.model.find(filter);
+        });
+    }
+    findById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.model.findOne({ email });
+            return this.model.findById(id);
+        });
+    }
+    create(item) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.model.create(item);
+        });
+    }
+    update(id, update) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.model.findByIdAndUpdate(id, update, { new: true });
+        });
+    }
+    delete(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.model.findByIdAndDelete(id);
         });
     }
 }
-exports.default = UserRepository;
+exports.default = BaseRepository;
