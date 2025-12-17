@@ -7,9 +7,14 @@ import urlRouter from "./routes/urlRoutes";
 import publicRoute from "./routes/publicRoutes";
 
 dotenv.config();
+const allowedOrigins=[
+    "http://localhost:5173",
+    "https://url-shortner-1-frontend-un95.onrender.com"
+]
 
 const app = express();
-app.use(cors());
+app.use(cors({origin:allowedOrigins,
+    credentials:true}));
 app.use(express.json());
 connectDB();
 

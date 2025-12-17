@@ -49,8 +49,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const logout = () => {
     setToken(null);
-    localStorage.removeItem('token'); // Remove token from localStorage
-    // Remove default header to avoid sending stale token
+    localStorage.removeItem('token');
     if (axiosInstance.defaults.headers.common['Authorization']) {
       delete axiosInstance.defaults.headers.common['Authorization'];
     }
